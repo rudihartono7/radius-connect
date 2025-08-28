@@ -1,0 +1,827 @@
+### RADIUS API Tests
+### This file contains comprehensive tests for RadiusController endpoints
+### Make sure to run authentication tests first to get valid tokens
+
+### Variables (inherit from master file)
+# @baseUrl = {{baseUrl}}
+# @contentType = {{contentType}}
+# @adminToken = Bearer your_admin_token_here
+# @managerToken = Bearer your_manager_token_here
+# @userToken = Bearer your_user_token_here
+
+### Test Data
+@testRadiusUsername = radiustest123
+@testRadiusPassword = RadiusPassword123!
+@testGroupName = TestGroup
+@testSessionId = session_id_here
+@testAttributeId = 1
+@testStartDate = 2024-01-01
+@testEndDate = 2024-01-31
+
+###
+### ========== RADIUS USERS ==========
+###
+
+### 1. GET RADIUS Users (Paginated List) - Admin Access
+GET {{baseUrl}}/api/radius/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 2. GET RADIUS Users with Pagination - Admin Access
+GET {{baseUrl}}/api/radius/users?page=1&pageSize=5
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 3. GET RADIUS Users - Manager Access
+GET {{baseUrl}}/api/radius/users
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 4. GET RADIUS Users - Unauthorized (User Role)
+GET {{baseUrl}}/api/radius/users
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 5. GET RADIUS Users - No Token
+GET {{baseUrl}}/api/radius/users
+Content-Type: {{contentType}}
+
+###
+### 6. GET Specific RADIUS User - Admin Access
+GET {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 7. GET Specific RADIUS User - Manager Access
+GET {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 8. GET Specific RADIUS User - Unauthorized
+GET {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 9. GET Non-existent RADIUS User
+GET {{baseUrl}}/api/radius/users/nonexistentuser
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 10. CREATE RADIUS User - Admin Access (Success)
+POST {{baseUrl}}/api/radius/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testRadiusUsername}}",
+  "password": "{{testRadiusPassword}}",
+  "attributes": {
+    "Framed-Protocol": "PPP",
+    "Service-Type": "Framed-User"
+  }
+}
+
+###
+### 11. CREATE RADIUS User - Manager Access (Success)
+POST {{baseUrl}}/api/radius/users
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "managerradius123",
+  "password": "{{testRadiusPassword}}",
+  "attributes": {
+    "Framed-Protocol": "PPP"
+  }
+}
+
+###
+### 12. CREATE RADIUS User - Unauthorized (User Role)
+POST {{baseUrl}}/api/radius/users
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "unauthorized123",
+  "password": "{{testRadiusPassword}}"
+}
+
+###
+### 13. CREATE RADIUS User - Duplicate Username
+POST {{baseUrl}}/api/radius/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testRadiusUsername}}",
+  "password": "{{testRadiusPassword}}"
+}
+
+###
+### 14. CREATE RADIUS User - Invalid Data (Missing Required Fields)
+POST {{baseUrl}}/api/radius/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "",
+  "password": ""
+}
+
+###
+### 15. UPDATE RADIUS User - Admin Access (Password Only)
+PUT {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "password": "NewPassword123!"
+}
+
+###
+### 16. UPDATE RADIUS User - Admin Access (Attributes Only)
+PUT {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "attributes": {
+    "Framed-Protocol": "PPP",
+    "Service-Type": "Framed-User",
+    "Framed-IP-Address": "192.168.1.100"
+  }
+}
+
+###
+### 17. UPDATE RADIUS User - Manager Access
+PUT {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "password": "ManagerUpdated123!",
+  "attributes": {
+    "Service-Type": "Login-User"
+  }
+}
+
+###
+### 18. UPDATE RADIUS User - Unauthorized
+PUT {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "password": "Unauthorized123!"
+}
+
+###
+### 19. UPDATE Non-existent RADIUS User
+PUT {{baseUrl}}/api/radius/users/nonexistentuser
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "password": "NewPassword123!"
+}
+
+###
+### 20. DELETE RADIUS User - Admin Access
+DELETE {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 21. DELETE RADIUS User - Manager Access
+DELETE {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 22. DELETE RADIUS User - Unauthorized
+DELETE {{baseUrl}}/api/radius/users/{{testRadiusUsername}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 23. DELETE Non-existent RADIUS User
+DELETE {{baseUrl}}/api/radius/users/nonexistentuser
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== RADIUS USER ATTRIBUTES ==========
+###
+
+### 24. GET RADIUS User Attributes - Admin Access
+GET {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 25. GET RADIUS User Attributes - Manager Access
+GET {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 26. GET RADIUS User Attributes - Unauthorized
+GET {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 27. GET Attributes for Non-existent User
+GET {{baseUrl}}/api/radius/users/nonexistentuser/attributes
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 28. ADD RADIUS User Attribute - Admin Access
+POST {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "attribute": "Session-Timeout",
+  "op": ":=",
+  "value": "3600"
+}
+
+###
+### 29. ADD RADIUS User Attribute - Manager Access
+POST {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "attribute": "Idle-Timeout",
+  "op": ":=",
+  "value": "1800"
+}
+
+###
+### 30. ADD RADIUS User Attribute - Unauthorized
+POST {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "attribute": "Framed-MTU",
+  "op": ":=",
+  "value": "1500"
+}
+
+###
+### 31. ADD Attribute - Invalid Data (Missing Fields)
+POST {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "attribute": "",
+  "op": "",
+  "value": ""
+}
+
+###
+### 32. ADD Attribute to Non-existent User
+POST {{baseUrl}}/api/radius/users/nonexistentuser/attributes
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "attribute": "Session-Timeout",
+  "op": ":=",
+  "value": "3600"
+}
+
+###
+### 33. REMOVE RADIUS User Attribute - Admin Access
+DELETE {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes/{{testAttributeId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 34. REMOVE RADIUS User Attribute - Manager Access
+DELETE {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes/{{testAttributeId}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 35. REMOVE RADIUS User Attribute - Unauthorized
+DELETE {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/attributes/{{testAttributeId}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 36. REMOVE Attribute from Non-existent User
+DELETE {{baseUrl}}/api/radius/users/nonexistentuser/attributes/{{testAttributeId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== RADIUS GROUPS ==========
+###
+
+### 37. GET RADIUS Groups - Admin Access
+GET {{baseUrl}}/api/radius/groups
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 38. GET RADIUS Groups with Pagination - Admin Access
+GET {{baseUrl}}/api/radius/groups?page=1&pageSize=5
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 39. GET RADIUS Groups - Manager Access
+GET {{baseUrl}}/api/radius/groups
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 40. GET RADIUS Groups - Unauthorized
+GET {{baseUrl}}/api/radius/groups
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 41. GET Specific RADIUS Group - Admin Access
+GET {{baseUrl}}/api/radius/groups/{{testGroupName}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 42. GET Specific RADIUS Group - Manager Access
+GET {{baseUrl}}/api/radius/groups/{{testGroupName}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 43. GET Non-existent RADIUS Group
+GET {{baseUrl}}/api/radius/groups/NonExistentGroup
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 44. CREATE RADIUS Group - Admin Access
+POST {{baseUrl}}/api/radius/groups
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "groupName": "{{testGroupName}}",
+  "checkAttributes": {
+    "Huntgroup-Name": "dialup"
+  },
+  "replyAttributes": {
+    "Framed-Protocol": "PPP",
+    "Service-Type": "Framed-User"
+  }
+}
+
+###
+### 45. CREATE RADIUS Group - Manager Access
+POST {{baseUrl}}/api/radius/groups
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "groupName": "ManagerGroup",
+  "replyAttributes": {
+    "Service-Type": "Login-User"
+  }
+}
+
+###
+### 46. CREATE RADIUS Group - Unauthorized
+POST {{baseUrl}}/api/radius/groups
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "groupName": "UnauthorizedGroup"
+}
+
+###
+### 47. CREATE RADIUS Group - Duplicate Name
+POST {{baseUrl}}/api/radius/groups
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "groupName": "{{testGroupName}}"
+}
+
+###
+### 48. CREATE RADIUS Group - Invalid Data
+POST {{baseUrl}}/api/radius/groups
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "groupName": ""
+}
+
+###
+### 49. DELETE RADIUS Group - Admin Access
+DELETE {{baseUrl}}/api/radius/groups/{{testGroupName}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 50. DELETE RADIUS Group - Manager Access
+DELETE {{baseUrl}}/api/radius/groups/{{testGroupName}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 51. DELETE RADIUS Group - Unauthorized
+DELETE {{baseUrl}}/api/radius/groups/{{testGroupName}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 52. DELETE Non-existent RADIUS Group
+DELETE {{baseUrl}}/api/radius/groups/NonExistentGroup
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== GROUP-USER MANAGEMENT ==========
+###
+
+### 53. ADD User to Group - Admin Access
+POST {{baseUrl}}/api/radius/groups/{{testGroupName}}/users/{{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "priority": 1
+}
+
+###
+### 54. ADD User to Group - Manager Access
+POST {{baseUrl}}/api/radius/groups/{{testGroupName}}/users/{{testRadiusUsername}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "priority": 2
+}
+
+###
+### 55. ADD User to Group - Unauthorized
+POST {{baseUrl}}/api/radius/groups/{{testGroupName}}/users/{{testRadiusUsername}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "priority": 1
+}
+
+###
+### 56. ADD Non-existent User to Group
+POST {{baseUrl}}/api/radius/groups/{{testGroupName}}/users/nonexistentuser
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "priority": 1
+}
+
+###
+### 57. ADD User to Non-existent Group
+POST {{baseUrl}}/api/radius/groups/NonExistentGroup/users/{{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "priority": 1
+}
+
+###
+### 58. REMOVE User from Group - Admin Access
+DELETE {{baseUrl}}/api/radius/groups/{{testGroupName}}/users/{{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 59. REMOVE User from Group - Manager Access
+DELETE {{baseUrl}}/api/radius/groups/{{testGroupName}}/users/{{testRadiusUsername}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 60. REMOVE User from Group - Unauthorized
+DELETE {{baseUrl}}/api/radius/groups/{{testGroupName}}/users/{{testRadiusUsername}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 61. GET Group Users - Admin Access
+GET {{baseUrl}}/api/radius/groups/{{testGroupName}}/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 62. GET Group Users - Manager Access
+GET {{baseUrl}}/api/radius/groups/{{testGroupName}}/users
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 63. GET Group Users - Non-existent Group
+GET {{baseUrl}}/api/radius/groups/NonExistentGroup/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 64. GET User Groups - Admin Access
+GET {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/groups
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 65. GET User Groups - Manager Access
+GET {{baseUrl}}/api/radius/users/{{testRadiusUsername}}/groups
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 66. GET Groups for Non-existent User
+GET {{baseUrl}}/api/radius/users/nonexistentuser/groups
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== SESSIONS ==========
+###
+
+### 67. GET Active Sessions - Admin Access
+GET {{baseUrl}}/api/radius/sessions
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 68. GET Active Sessions with Pagination - Admin Access
+GET {{baseUrl}}/api/radius/sessions?page=1&pageSize=5
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 69. GET Active Sessions - Manager Access
+GET {{baseUrl}}/api/radius/sessions
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 70. GET Active Sessions - Unauthorized
+GET {{baseUrl}}/api/radius/sessions
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 71. GET Specific Session - Admin Access
+GET {{baseUrl}}/api/radius/sessions/{{testSessionId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 72. GET Specific Session - Manager Access
+GET {{baseUrl}}/api/radius/sessions/{{testSessionId}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 73. GET Non-existent Session
+GET {{baseUrl}}/api/radius/sessions/nonexistent-session-id
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 74. DISCONNECT Session - Admin Access
+POST {{baseUrl}}/api/radius/sessions/{{testSessionId}}/disconnect
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "reason": "Administrative disconnect for testing"
+}
+
+###
+### 75. DISCONNECT Session - Manager Access
+POST {{baseUrl}}/api/radius/sessions/{{testSessionId}}/disconnect
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "reason": "Manager initiated disconnect"
+}
+
+###
+### 76. DISCONNECT Session - Unauthorized
+POST {{baseUrl}}/api/radius/sessions/{{testSessionId}}/disconnect
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "reason": "Unauthorized disconnect attempt"
+}
+
+###
+### 77. DISCONNECT Non-existent Session
+POST {{baseUrl}}/api/radius/sessions/nonexistent-session-id/disconnect
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "reason": "Test disconnect"
+}
+
+###
+### 78. GET User Sessions - Admin Access
+GET {{baseUrl}}/api/radius/sessions/user/{{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 79. GET User Sessions with Pagination - Admin Access
+GET {{baseUrl}}/api/radius/sessions/user/{{testRadiusUsername}}?page=1&pageSize=5
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 80. GET User Sessions - Manager Access
+GET {{baseUrl}}/api/radius/sessions/user/{{testRadiusUsername}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== AUTHENTICATION LOGS ==========
+###
+
+### 81. GET Authentication Logs - Admin Access
+GET {{baseUrl}}/api/radius/auth-logs
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 82. GET Authentication Logs with Pagination - Admin Access
+GET {{baseUrl}}/api/radius/auth-logs?page=1&pageSize=10
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 83. GET Authentication Logs - Manager Access
+GET {{baseUrl}}/api/radius/auth-logs
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 84. GET Authentication Logs - Unauthorized
+GET {{baseUrl}}/api/radius/auth-logs
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 85. GET Authentication Logs for Specific User
+GET {{baseUrl}}/api/radius/auth-logs?username={{testRadiusUsername}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 86. GET Authentication Logs with Date Range
+GET {{baseUrl}}/api/radius/auth-logs?startDate={{testStartDate}}&endDate={{testEndDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 87. GET Authentication Logs - Invalid Date Range
+GET {{baseUrl}}/api/radius/auth-logs?startDate={{testEndDate}}&endDate={{testStartDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== STATISTICS ==========
+###
+
+### 88. GET RADIUS Overview Statistics - Admin Access
+GET {{baseUrl}}/api/radius/stats/overview
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 89. GET RADIUS Overview Statistics - Manager Access
+GET {{baseUrl}}/api/radius/stats/overview
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 90. GET RADIUS Overview Statistics - Unauthorized
+GET {{baseUrl}}/api/radius/stats/overview
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 91. GET Session Statistics - Admin Access
+GET {{baseUrl}}/api/radius/stats/sessions
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 92. GET Session Statistics with Date Range - Admin Access
+GET {{baseUrl}}/api/radius/stats/sessions?startDate={{testStartDate}}&endDate={{testEndDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 93. GET Session Statistics - Manager Access
+GET {{baseUrl}}/api/radius/stats/sessions
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 94. GET Authentication Statistics - Admin Access
+GET {{baseUrl}}/api/radius/stats/authentication
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 95. GET Authentication Statistics with Date Range - Admin Access
+GET {{baseUrl}}/api/radius/stats/authentication?startDate={{testStartDate}}&endDate={{testEndDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 96. GET Authentication Statistics - Manager Access
+GET {{baseUrl}}/api/radius/stats/authentication
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 97. GET Authentication Statistics - Invalid Date Format
+GET {{baseUrl}}/api/radius/stats/authentication?startDate=invalid-date&endDate=also-invalid
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== EDGE CASES AND SECURITY TESTS ==========
+###
+
+### 98. SQL Injection Attempt - Username Parameter
+GET {{baseUrl}}/api/radius/users/'; DROP TABLE radcheck; --
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 99. XSS Attempt - Group Name Parameter
+GET {{baseUrl}}/api/radius/groups/<script>alert('xss')</script>
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 100. Large Payload Test - Create User with Many Attributes
+POST {{baseUrl}}/api/radius/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "largeattributes",
+  "password": "{{testRadiusPassword}}",
+  "attributes": {
+    "Attr1": "Value1",
+    "Attr2": "Value2",
+    "Attr3": "Value3",
+    "Attr4": "Value4",
+    "Attr5": "Value5",
+    "Attr6": "Value6",
+    "Attr7": "Value7",
+    "Attr8": "Value8",
+    "Attr9": "Value9",
+    "Attr10": "Value10"
+  }
+}
+
+### End of RADIUS API Tests
+### Expected Results Summary:
+### - Admin and Manager users should have access to all RADIUS endpoints
+### - Regular users should be denied access to all RADIUS endpoints
+### - All CRUD operations should work correctly with proper validation
+### - Group-user relationships should be managed properly
+### - Session management should work for active sessions
+### - Authentication logs should be retrievable with filtering
+### - Statistics endpoints should return meaningful data
+### - Security vulnerabilities (XSS, SQL injection) should be prevented
+### - All endpoints should return consistent JSON response format
+### - Proper HTTP status codes should be returned for all scenarios

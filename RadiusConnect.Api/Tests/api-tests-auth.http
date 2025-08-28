@@ -1,0 +1,268 @@
+### RadiusConnect API - Authentication Tests
+### Import variables from master file
+< ./api-tests-master.http
+
+### 1. User Registration - Valid Data
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### 2. User Registration - Invalid Data (Missing Required Fields)
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "",
+  "email": "invalid-email",
+  "password": "123"
+}
+
+### 3. User Registration - Duplicate Username
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}",
+  "email": "another@example.com",
+  "password": "{{testPassword}}"
+}
+
+### 4. User Login - Valid Credentials
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}",
+  "password": "{{testPassword}}"
+}
+
+> {
+%
+  if (response.body.success) {
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+  }
+%
+}
+
+### 5. User Login - Invalid Credentials
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}",
+  "password": "wrongpassword"
+}
+
+### 6. User Login - Missing Credentials
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "",
+  "password": ""
+}
+
+### 7. User Login - With TOTP (if enabled)
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}",
+  "password": "{{testPassword}}",
+  "totpCode": "123456"
+}
+
+### 8. Get Current User Info
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 9. Get Current User Info - No Token
+GET {{baseUrl}}/api/auth/me
+
+### 10. Get Current User Info - Invalid Token
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer invalid_token_here
+
+### 11. Refresh Token - Valid Refresh Token
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {
+%
+  if (response.body.success) {
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+  }
+%
+}
+
+### 12. Refresh Token - Invalid Refresh Token
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "invalid_refresh_token"
+}
+
+### 13. Refresh Token - Missing Refresh Token
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": ""
+}
+
+### 14. Change Password - Valid Data
+POST {{baseUrl}}/api/auth/change-password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "currentPassword": "{{testPassword}}",
+  "newPassword": "NewTestPassword123!",
+  "confirmPassword": "NewTestPassword123!"
+}
+
+### 15. Change Password - Wrong Current Password
+POST {{baseUrl}}/api/auth/change-password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "currentPassword": "wrongpassword",
+  "newPassword": "NewTestPassword123!",
+  "confirmPassword": "NewTestPassword123!"
+}
+
+### 16. Change Password - Passwords Don't Match
+POST {{baseUrl}}/api/auth/change-password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "currentPassword": "{{testPassword}}",
+  "newPassword": "NewTestPassword123!",
+  "confirmPassword": "DifferentPassword123!"
+}
+
+### 17. Change Password - No Authorization
+POST {{baseUrl}}/api/auth/change-password
+Content-Type: {{contentType}}
+
+{
+  "currentPassword": "{{testPassword}}",
+  "newPassword": "NewTestPassword123!",
+  "confirmPassword": "NewTestPassword123!"
+}
+
+### 18. Forgot Password - Valid Email
+POST {{baseUrl}}/api/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}"
+}
+
+### 19. Forgot Password - Invalid Email
+POST {{baseUrl}}/api/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "nonexistent@example.com"
+}
+
+### 20. Forgot Password - Missing Email
+POST {{baseUrl}}/api/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": ""
+}
+
+### 21. Reset Password - Valid Data
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}",
+  "token": "reset_token_here",
+  "newPassword": "ResetPassword123!",
+  "confirmPassword": "ResetPassword123!"
+}
+
+### 22. Reset Password - Invalid Token
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}",
+  "token": "invalid_token",
+  "newPassword": "ResetPassword123!",
+  "confirmPassword": "ResetPassword123!"
+}
+
+### 23. Reset Password - Passwords Don't Match
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: {{contentType}}
+
+{
+  "email": "{{testEmail}}",
+  "token": "reset_token_here",
+  "newPassword": "ResetPassword123!",
+  "confirmPassword": "DifferentPassword123!"
+}
+
+### 24. Logout - Valid Request
+POST {{baseUrl}}/api/auth/logout
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 25. Logout - No Authorization
+POST {{baseUrl}}/api/auth/logout
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 26. Logout - Missing Refresh Token
+POST {{baseUrl}}/api/auth/logout
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "refreshToken": ""
+}
+
+###
+# Authentication Test Summary:
+# - Registration: Valid/Invalid data, duplicate username
+# - Login: Valid/Invalid credentials, TOTP scenarios
+# - Token management: Refresh, validation, expiration
+# - Password operations: Change, forgot, reset
+# - User info retrieval: Authenticated/Unauthenticated
+# - Logout: Various scenarios
+#
+# Expected Results:
+# - Valid operations should return 200 with success: true
+# - Invalid operations should return appropriate error codes
+# - Authentication required endpoints should return 401 without token
+# - Validation errors should return 400 with error details
+###

@@ -1,0 +1,474 @@
+### AUDIT API Tests
+### This file contains comprehensive tests for AuditController endpoints
+### Make sure to run authentication tests first to get valid tokens
+
+### Variables (inherit from master file)
+# @baseUrl = {{baseUrl}}
+# @contentType = {{contentType}}
+# @adminToken = Bearer your_admin_token_here
+# @managerToken = Bearer your_manager_token_here
+# @userToken = Bearer your_user_token_here
+
+### Test Data
+@testAuditId = 1
+@testActorId = test-user-id
+@testEntityType = User
+@testEntityId = test-entity-id
+@testStartDate = 2024-01-01
+@testEndDate = 2024-01-31
+@testAction = Create
+@testPageSize = 10
+@testPage = 1
+
+###
+### ========== AUDIT LOGS ==========
+###
+
+### 1. GET All Audit Logs - Admin Access
+GET {{baseUrl}}/api/audit/logs
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 2. GET All Audit Logs with Pagination - Admin Access
+GET {{baseUrl}}/api/audit/logs?page={{testPage}}&pageSize={{testPageSize}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 3. GET All Audit Logs - Manager Access
+GET {{baseUrl}}/api/audit/logs
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 4. GET All Audit Logs - Unauthorized (User Role)
+GET {{baseUrl}}/api/audit/logs
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 5. GET All Audit Logs - No Token
+GET {{baseUrl}}/api/audit/logs
+Content-Type: {{contentType}}
+
+###
+### 6. GET Audit Logs with Date Range Filter - Admin Access
+GET {{baseUrl}}/api/audit/logs?startDate={{testStartDate}}&endDate={{testEndDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 7. GET Audit Logs with Action Filter - Admin Access
+GET {{baseUrl}}/api/audit/logs?action={{testAction}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 8. GET Audit Logs with Entity Type Filter - Admin Access
+GET {{baseUrl}}/api/audit/logs?entityType={{testEntityType}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 9. GET Audit Logs with Multiple Filters - Admin Access
+GET {{baseUrl}}/api/audit/logs?startDate={{testStartDate}}&endDate={{testEndDate}}&action={{testAction}}&entityType={{testEntityType}}&page={{testPage}}&pageSize={{testPageSize}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 10. GET Audit Logs with Invalid Date Range (End before Start)
+GET {{baseUrl}}/api/audit/logs?startDate={{testEndDate}}&endDate={{testStartDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 11. GET Audit Logs with Invalid Date Format
+GET {{baseUrl}}/api/audit/logs?startDate=invalid-date&endDate=also-invalid
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 12. GET Audit Logs with Large Page Size
+GET {{baseUrl}}/api/audit/logs?pageSize=1000
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 13. GET Audit Logs with Zero Page Size
+GET {{baseUrl}}/api/audit/logs?pageSize=0
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 14. GET Audit Logs with Negative Page Number
+GET {{baseUrl}}/api/audit/logs?page=-1
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 15. GET Specific Audit Log - Admin Access
+GET {{baseUrl}}/api/audit/logs/{{testAuditId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 16. GET Specific Audit Log - Manager Access
+GET {{baseUrl}}/api/audit/logs/{{testAuditId}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 17. GET Specific Audit Log - Unauthorized (User Role)
+GET {{baseUrl}}/api/audit/logs/{{testAuditId}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 18. GET Non-existent Audit Log
+GET {{baseUrl}}/api/audit/logs/999999
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 19. GET Audit Log with Invalid ID Format
+GET {{baseUrl}}/api/audit/logs/invalid-id
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== AUDIT LOGS BY ACTOR ==========
+###
+
+### 20. GET Audit Logs by Actor - Admin Access
+GET {{baseUrl}}/api/audit/logs/actor/{{testActorId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 21. GET Audit Logs by Actor with Pagination - Admin Access
+GET {{baseUrl}}/api/audit/logs/actor/{{testActorId}}?page={{testPage}}&pageSize={{testPageSize}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 22. GET Audit Logs by Actor - Manager Access
+GET {{baseUrl}}/api/audit/logs/actor/{{testActorId}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 23. GET Audit Logs by Actor - Unauthorized (User Role)
+GET {{baseUrl}}/api/audit/logs/actor/{{testActorId}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 24. GET Audit Logs by Actor with Date Range - Admin Access
+GET {{baseUrl}}/api/audit/logs/actor/{{testActorId}}?startDate={{testStartDate}}&endDate={{testEndDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 25. GET Audit Logs by Actor with Action Filter - Admin Access
+GET {{baseUrl}}/api/audit/logs/actor/{{testActorId}}?action={{testAction}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 26. GET Audit Logs by Actor with Entity Type Filter - Admin Access
+GET {{baseUrl}}/api/audit/logs/actor/{{testActorId}}?entityType={{testEntityType}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 27. GET Audit Logs by Actor - All Filters Combined
+GET {{baseUrl}}/api/audit/logs/actor/{{testActorId}}?startDate={{testStartDate}}&endDate={{testEndDate}}&action={{testAction}}&entityType={{testEntityType}}&page={{testPage}}&pageSize={{testPageSize}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 28. GET Audit Logs by Non-existent Actor
+GET {{baseUrl}}/api/audit/logs/actor/non-existent-actor-id
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 29. GET Audit Logs by Empty Actor ID
+GET {{baseUrl}}/api/audit/logs/actor/
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== AUDIT LOGS BY ENTITY ==========
+###
+
+### 30. GET Audit Logs by Entity - Admin Access
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/{{testEntityId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 31. GET Audit Logs by Entity with Pagination - Admin Access
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/{{testEntityId}}?page={{testPage}}&pageSize={{testPageSize}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 32. GET Audit Logs by Entity - Manager Access
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/{{testEntityId}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 33. GET Audit Logs by Entity - Unauthorized (User Role)
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/{{testEntityId}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 34. GET Audit Logs by Entity with Date Range - Admin Access
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/{{testEntityId}}?startDate={{testStartDate}}&endDate={{testEndDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 35. GET Audit Logs by Entity with Action Filter - Admin Access
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/{{testEntityId}}?action={{testAction}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 36. GET Audit Logs by Entity with Actor Filter - Admin Access
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/{{testEntityId}}?actorId={{testActorId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 37. GET Audit Logs by Entity - All Filters Combined
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/{{testEntityId}}?startDate={{testStartDate}}&endDate={{testEndDate}}&action={{testAction}}&actorId={{testActorId}}&page={{testPage}}&pageSize={{testPageSize}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 38. GET Audit Logs by Non-existent Entity Type
+GET {{baseUrl}}/api/audit/logs/entity/NonExistentType/{{testEntityId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 39. GET Audit Logs by Non-existent Entity ID
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/non-existent-entity-id
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 40. GET Audit Logs by Empty Entity Type
+GET {{baseUrl}}/api/audit/logs/entity//{{testEntityId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 41. GET Audit Logs by Empty Entity ID
+GET {{baseUrl}}/api/audit/logs/entity/{{testEntityType}}/
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== SEARCH AND FILTERING TESTS ==========
+###
+
+### 42. Search Audit Logs - Multiple Actions
+GET {{baseUrl}}/api/audit/logs?action=Create,Update,Delete
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 43. Search Audit Logs - Multiple Entity Types
+GET {{baseUrl}}/api/audit/logs?entityType=User,RadiusUser,Group
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 44. Search Audit Logs - Case Sensitivity Test (Action)
+GET {{baseUrl}}/api/audit/logs?action=create
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 45. Search Audit Logs - Case Sensitivity Test (Entity Type)
+GET {{baseUrl}}/api/audit/logs?entityType=user
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 46. Search Audit Logs - Partial Actor ID Match
+GET {{baseUrl}}/api/audit/logs/actor/test
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 47. Search Audit Logs - Today's Logs Only
+GET {{baseUrl}}/api/audit/logs?startDate=2024-01-15&endDate=2024-01-15
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 48. Search Audit Logs - Last 7 Days
+GET {{baseUrl}}/api/audit/logs?startDate=2024-01-08&endDate=2024-01-15
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 49. Search Audit Logs - Last 30 Days
+GET {{baseUrl}}/api/audit/logs?startDate=2023-12-16&endDate=2024-01-15
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== PERFORMANCE AND STRESS TESTS ==========
+###
+
+### 50. Large Page Size Test (Performance)
+GET {{baseUrl}}/api/audit/logs?pageSize=500
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 51. Deep Pagination Test
+GET {{baseUrl}}/api/audit/logs?page=100&pageSize=50
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 52. Complex Filter Combination (Performance)
+GET {{baseUrl}}/api/audit/logs?startDate=2023-01-01&endDate=2024-12-31&action=Create,Update,Delete&entityType=User,RadiusUser,Group&page=1&pageSize=100
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== EDGE CASES AND SECURITY TESTS ==========
+###
+
+### 53. SQL Injection Attempt - Actor ID Parameter
+GET {{baseUrl}}/api/audit/logs/actor/'; DROP TABLE AuditLogs; --
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 54. SQL Injection Attempt - Entity Type Parameter
+GET {{baseUrl}}/api/audit/logs/entity/'; DROP TABLE AuditLogs; --/test-id
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 55. SQL Injection Attempt - Entity ID Parameter
+GET {{baseUrl}}/api/audit/logs/entity/User/'; DROP TABLE AuditLogs; --
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 56. XSS Attempt - Action Parameter
+GET {{baseUrl}}/api/audit/logs?action=<script>alert('xss')</script>
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 57. XSS Attempt - Entity Type Parameter
+GET {{baseUrl}}/api/audit/logs?entityType=<script>alert('xss')</script>
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 58. Path Traversal Attempt - Actor ID
+GET {{baseUrl}}/api/audit/logs/actor/../../../etc/passwd
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 59. Path Traversal Attempt - Entity Type
+GET {{baseUrl}}/api/audit/logs/entity/../../../etc/passwd/test-id
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 60. Unicode Characters in Parameters
+GET {{baseUrl}}/api/audit/logs?action=Créate&entityType=Usér
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 61. Very Long Parameter Values
+GET {{baseUrl}}/api/audit/logs/actor/this-is-a-very-long-actor-id-that-exceeds-normal-length-expectations-and-might-cause-issues-with-database-queries-or-url-parsing-mechanisms
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 62. Special Characters in Parameters
+GET {{baseUrl}}/api/audit/logs/actor/test@user.com
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 63. URL Encoded Parameters
+GET {{baseUrl}}/api/audit/logs/actor/test%40user.com
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### ========== AUTHORIZATION BOUNDARY TESTS ==========
+###
+
+### 64. Manager Access to Sensitive Audit Data
+GET {{baseUrl}}/api/audit/logs?entityType=SystemConfiguration
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 65. Manager Access to Admin Actions
+GET {{baseUrl}}/api/audit/logs?action=SystemConfigurationUpdate
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 66. User Role Attempting Admin Endpoint
+GET {{baseUrl}}/api/audit/logs/actor/admin-user-id
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 67. Expired Token Test (Replace with expired token)
+# GET {{baseUrl}}/api/audit/logs
+# Authorization: Bearer expired_token_here
+# Content-Type: {{contentType}}
+
+###
+### 68. Malformed Token Test
+GET {{baseUrl}}/api/audit/logs
+Authorization: Bearer malformed.token.here
+Content-Type: {{contentType}}
+
+###
+### 69. Empty Authorization Header
+GET {{baseUrl}}/api/audit/logs
+Authorization: 
+Content-Type: {{contentType}}
+
+###
+### 70. Wrong Authorization Scheme
+GET {{baseUrl}}/api/audit/logs
+Authorization: Basic dGVzdDp0ZXN0
+Content-Type: {{contentType}}
+
+### End of AUDIT API Tests
+### Expected Results Summary:
+### - Admin users should have full access to all audit endpoints
+### - Manager users should have read access to audit logs
+### - Regular users should be denied access to all audit endpoints
+### - All filtering parameters should work correctly
+### - Pagination should function properly with various page sizes
+### - Date range filtering should validate input properly
+### - Security vulnerabilities (XSS, SQL injection) should be prevented
+### - Invalid parameters should return appropriate error responses
+### - All endpoints should return consistent JSON response format
+### - Proper HTTP status codes should be returned for all scenarios

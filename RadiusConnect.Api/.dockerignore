@@ -1,0 +1,7 @@
+Dockerfile
+.dockerignore
+bin/
+obj/
+node_modules/
+data_app/
+data_protect/

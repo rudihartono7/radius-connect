@@ -1,0 +1,328 @@
+### Dashboard API Tests
+### This file contains comprehensive tests for DashboardController endpoints
+### Make sure to run authentication tests first to get valid tokens
+
+### Variables (inherit from master file)
+# @baseUrl = {{baseUrl}}
+# @contentType = {{contentType}}
+# @adminToken = Bearer your_admin_token_here
+# @managerToken = Bearer your_manager_token_here
+# @userToken = Bearer your_user_token_here
+
+### Test Parameters
+@testDays = 7
+@testHours = 24
+@testStartDate = 2024-01-01
+@testEndDate = 2024-01-31
+
+###
+### 1. GET Overview Stats - Admin Access
+GET {{baseUrl}}/api/dashboard/overview
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 2. GET Overview Stats - Manager Access
+GET {{baseUrl}}/api/dashboard/overview
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 3. GET Overview Stats - User Access
+GET {{baseUrl}}/api/dashboard/overview
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 4. GET Overview Stats - Unauthorized (No Token)
+GET {{baseUrl}}/api/dashboard/overview
+Content-Type: {{contentType}}
+
+###
+### 5. GET System Health Stats - Admin Access
+GET {{baseUrl}}/api/dashboard/system-health
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 6. GET System Health Stats - Manager Access
+GET {{baseUrl}}/api/dashboard/system-health
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 7. GET System Health Stats - User Access
+GET {{baseUrl}}/api/dashboard/system-health
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 8. GET System Health Stats - Unauthorized (No Token)
+GET {{baseUrl}}/api/dashboard/system-health
+Content-Type: {{contentType}}
+
+###
+### 9. GET Session Stats - Admin Access (Default Period)
+GET {{baseUrl}}/api/dashboard/sessions
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 10. GET Session Stats - Admin Access (Custom Days)
+GET {{baseUrl}}/api/dashboard/sessions?days={{testDays}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 11. GET Session Stats - Manager Access
+GET {{baseUrl}}/api/dashboard/sessions?days={{testDays}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 12. GET Session Stats - User Access
+GET {{baseUrl}}/api/dashboard/sessions?days={{testDays}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 13. GET Session Stats - Invalid Days Parameter (Negative)
+GET {{baseUrl}}/api/dashboard/sessions?days=-1
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 14. GET Session Stats - Invalid Days Parameter (Zero)
+GET {{baseUrl}}/api/dashboard/sessions?days=0
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 15. GET Session Stats - Large Days Parameter
+GET {{baseUrl}}/api/dashboard/sessions?days=365
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 16. GET Hourly Session Stats - Admin Access (Default Hours)
+GET {{baseUrl}}/api/dashboard/sessions/hourly
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 17. GET Hourly Session Stats - Admin Access (Custom Hours)
+GET {{baseUrl}}/api/dashboard/sessions/hourly?hours={{testHours}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 18. GET Hourly Session Stats - Manager Access
+GET {{baseUrl}}/api/dashboard/sessions/hourly?hours={{testHours}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 19. GET Hourly Session Stats - User Access
+GET {{baseUrl}}/api/dashboard/sessions/hourly?hours={{testHours}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 20. GET Hourly Session Stats - Invalid Hours Parameter (Negative)
+GET {{baseUrl}}/api/dashboard/sessions/hourly?hours=-1
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 21. GET Hourly Session Stats - Invalid Hours Parameter (Zero)
+GET {{baseUrl}}/api/dashboard/sessions/hourly?hours=0
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 22. GET Hourly Session Stats - Large Hours Parameter
+GET {{baseUrl}}/api/dashboard/sessions/hourly?hours=168
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 23. GET Daily Session Stats - Admin Access (Default Days)
+GET {{baseUrl}}/api/dashboard/sessions/daily
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 24. GET Daily Session Stats - Admin Access (Custom Days)
+GET {{baseUrl}}/api/dashboard/sessions/daily?days={{testDays}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 25. GET Daily Session Stats - Manager Access
+GET {{baseUrl}}/api/dashboard/sessions/daily?days={{testDays}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 26. GET Daily Session Stats - User Access
+GET {{baseUrl}}/api/dashboard/sessions/daily?days={{testDays}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 27. GET Daily Session Stats - Invalid Days Parameter (Negative)
+GET {{baseUrl}}/api/dashboard/sessions/daily?days=-1
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 28. GET Daily Session Stats - Invalid Days Parameter (Zero)
+GET {{baseUrl}}/api/dashboard/sessions/daily?days=0
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 29. GET Daily Session Stats - Large Days Parameter
+GET {{baseUrl}}/api/dashboard/sessions/daily?days=90
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 30. GET Authentication Stats - Admin Access (Default Days)
+GET {{baseUrl}}/api/dashboard/authentication
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 31. GET Authentication Stats - Admin Access (Custom Days)
+GET {{baseUrl}}/api/dashboard/authentication?days={{testDays}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 32. GET Authentication Stats - Manager Access
+GET {{baseUrl}}/api/dashboard/authentication?days={{testDays}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 33. GET Authentication Stats - User Access
+GET {{baseUrl}}/api/dashboard/authentication?days={{testDays}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 34. GET Authentication Stats - Invalid Days Parameter (Negative)
+GET {{baseUrl}}/api/dashboard/authentication?days=-1
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 35. GET Authentication Stats - Invalid Days Parameter (Zero)
+GET {{baseUrl}}/api/dashboard/authentication?days=0
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 36. GET Authentication Stats - Large Days Parameter
+GET {{baseUrl}}/api/dashboard/authentication?days=365
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 37. GET Authentication Stats - Date Range (if supported)
+GET {{baseUrl}}/api/dashboard/authentication?startDate={{testStartDate}}&endDate={{testEndDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 38. GET Authentication Stats - Invalid Date Range
+GET {{baseUrl}}/api/dashboard/authentication?startDate={{testEndDate}}&endDate={{testStartDate}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 39. GET Authentication Stats - Invalid Date Format
+GET {{baseUrl}}/api/dashboard/authentication?startDate=invalid-date&endDate=also-invalid
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 40. GET Authentication Stats - Unauthorized (No Token)
+GET {{baseUrl}}/api/dashboard/authentication
+Content-Type: {{contentType}}
+
+###
+### 41. GET Overview Stats - Invalid Token
+GET {{baseUrl}}/api/dashboard/overview
+Authorization: Bearer invalid_token_here
+Content-Type: {{contentType}}
+
+###
+### 42. GET System Health Stats - Expired Token
+GET {{baseUrl}}/api/dashboard/system-health
+Authorization: Bearer expired_token_here
+Content-Type: {{contentType}}
+
+###
+### 43. GET Session Stats - Malformed Token
+GET {{baseUrl}}/api/dashboard/sessions
+Authorization: malformed_token_without_bearer
+Content-Type: {{contentType}}
+
+###
+### 44. Performance Test - Multiple Concurrent Requests
+### Note: Run these simultaneously to test performance
+GET {{baseUrl}}/api/dashboard/overview
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+GET {{baseUrl}}/api/dashboard/system-health
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+GET {{baseUrl}}/api/dashboard/sessions
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+GET {{baseUrl}}/api/dashboard/authentication
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 45. Edge Case - Very Large Parameters
+GET {{baseUrl}}/api/dashboard/sessions?days=999999
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 46. Edge Case - Non-numeric Parameters
+GET {{baseUrl}}/api/dashboard/sessions/hourly?hours=abc
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 47. Edge Case - Special Characters in Parameters
+GET {{baseUrl}}/api/dashboard/sessions/daily?days=<script>alert('xss')</script>
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 48. Edge Case - SQL Injection Attempt
+GET {{baseUrl}}/api/dashboard/authentication?days=1'; DROP TABLE Users; --
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+### End of Dashboard API Tests
+### Expected Results Summary:
+### - All authenticated users should have access to dashboard endpoints
+### - Invalid parameters should return appropriate error messages
+### - Large parameter values should be handled gracefully
+### - Security vulnerabilities (XSS, SQL injection) should be prevented
+### - Performance should be acceptable under concurrent load
+### - All endpoints should return consistent JSON response format
+### - Unauthorized requests should return 401 status code
+### - Invalid tokens should be properly rejected

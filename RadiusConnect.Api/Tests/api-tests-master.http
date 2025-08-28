@@ -1,0 +1,48 @@
+### RadiusConnect API Testing Suite
+### Master configuration file with environment variables and common setup
+
+# Environment Variables
+@baseUrl = http://localhost:5069
+@contentType = application/json
+
+# Authentication tokens (will be populated after login)
+@accessToken = 
+@refreshToken = 
+
+# Test user credentials
+@testUsername = testuser
+@testPassword = TestPassword123!
+@testEmail = testuser@example.com
+
+# Admin user credentials (for testing admin endpoints)
+@adminUsername = admin
+@adminPassword = AdminPassword123!
+@adminEmail = admin@example.com
+
+# Common headers
+@authHeader = Authorization: Bearer {{accessToken}}
+@jsonContentType = Content-Type: {{contentType}}
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Test Database Connection
+GET {{baseUrl}}/health/database
+
+###
+# Note: This file contains common variables and setup.
+# Individual test files will reference these variables.
+# 
+# Usage:
+# 1. Start the API server: dotnet run
+# 2. Run authentication tests first to get tokens
+# 3. Use the tokens in subsequent tests
+# 4. Update @accessToken and @refreshToken variables after successful login
+#
+# Test Files Structure:
+# - api-tests-auth.http (Authentication endpoints)
+# - api-tests-users.http (User management)
+# - api-tests-dashboard.http (Dashboard and statistics)
+# - api-tests-radius.http (RADIUS operations)
+# - api-tests-audit.http (Audit logs)
+###

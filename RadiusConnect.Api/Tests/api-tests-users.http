@@ -1,0 +1,513 @@
+### Users API Tests
+### This file contains comprehensive tests for UsersController endpoints
+### Make sure to run authentication tests first to get valid tokens
+
+### Variables (inherit from master file)
+# @baseUrl = {{baseUrl}}
+# @contentType = {{contentType}}
+# @adminToken = Bearer your_admin_token_here
+# @managerToken = Bearer your_manager_token_here
+# @userToken = Bearer your_user_token_here
+
+### Test User Data
+@testUserId = user_id_here
+@testUsername = testuser123
+@testEmail = testuser@example.com
+@testPassword = TestPassword123!
+@testRoleName = User
+@totpCode = 123456
+
+###
+### 1. GET Users (Paginated List) - Admin Access
+GET {{baseUrl}}/api/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 2. GET Users with Search - Admin Access
+GET {{baseUrl}}/api/users?search=test&page=1&pageSize=10
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 3. GET Users - Manager Access
+GET {{baseUrl}}/api/users
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 4. GET Users - Unauthorized (User Role)
+GET {{baseUrl}}/api/users
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 5. GET Specific User by ID - Admin Access
+GET {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 6. GET Specific User by ID - Manager Access
+GET {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 7. GET Specific User by ID - Unauthorized
+GET {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 8. GET Non-existent User
+GET {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 9. CREATE User - Admin Access (Success)
+POST {{baseUrl}}/api/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+###
+### 10. CREATE User - Manager Access (Success)
+POST {{baseUrl}}/api/users
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "managertest123",
+  "email": "managertest@example.com",
+  "password": "{{testPassword}}",
+  "firstName": "Manager",
+  "lastName": "Test"
+}
+
+###
+### 11. CREATE User - Unauthorized (User Role)
+POST {{baseUrl}}/api/users
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "unauthorized123",
+  "email": "unauthorized@example.com",
+  "password": "{{testPassword}}"
+}
+
+###
+### 12. CREATE User - Duplicate Username
+POST {{baseUrl}}/api/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}",
+  "email": "different@example.com",
+  "password": "{{testPassword}}"
+}
+
+###
+### 13. CREATE User - Duplicate Email
+POST {{baseUrl}}/api/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "differentuser",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+###
+### 14. CREATE User - Invalid Data (Missing Required Fields)
+POST {{baseUrl}}/api/users
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "",
+  "email": "invalid-email",
+  "password": "123"
+}
+
+###
+### 15. UPDATE User - Admin Access (Success)
+PUT {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}_updated",
+  "email": "updated_{{testEmail}}",
+  "firstName": "Updated",
+  "lastName": "User"
+}
+
+###
+### 16. UPDATE User - Manager Access (Success)
+PUT {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "{{testUsername}}_manager",
+  "email": "manager_{{testEmail}}",
+  "firstName": "Manager Updated",
+  "lastName": "User"
+}
+
+###
+### 17. UPDATE User - Unauthorized (User Role)
+PUT {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "unauthorized_update",
+  "email": "unauthorized@example.com"
+}
+
+###
+### 18. UPDATE Non-existent User
+PUT {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "nonexistent",
+  "email": "nonexistent@example.com"
+}
+
+###
+### 19. UPDATE User - Duplicate Username Conflict
+PUT {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "admin",
+  "email": "{{testEmail}}"
+}
+
+###
+### 20. DELETE User - Admin Access (Success)
+DELETE {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 21. DELETE User - Unauthorized (Manager Role)
+DELETE {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 22. DELETE User - Unauthorized (User Role)
+DELETE {{baseUrl}}/api/users/{{testUserId}}
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 23. DELETE Non-existent User
+DELETE {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 24. DELETE Self (Should Fail)
+# Note: Replace with actual admin user ID
+DELETE {{baseUrl}}/api/users/admin_user_id_here
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 25. ACTIVATE User - Admin Access (Success)
+POST {{baseUrl}}/api/users/{{testUserId}}/activate
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 26. ACTIVATE User - Manager Access (Success)
+POST {{baseUrl}}/api/users/{{testUserId}}/activate
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 27. ACTIVATE User - Unauthorized (User Role)
+POST {{baseUrl}}/api/users/{{testUserId}}/activate
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 28. ACTIVATE Already Active User
+POST {{baseUrl}}/api/users/{{testUserId}}/activate
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 29. ACTIVATE Non-existent User
+POST {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000/activate
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 30. DEACTIVATE User - Admin Access (Success)
+POST {{baseUrl}}/api/users/{{testUserId}}/deactivate
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 31. DEACTIVATE User - Manager Access (Success)
+POST {{baseUrl}}/api/users/{{testUserId}}/deactivate
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+###
+### 32. DEACTIVATE User - Unauthorized (User Role)
+POST {{baseUrl}}/api/users/{{testUserId}}/deactivate
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 33. DEACTIVATE Self (Should Fail)
+# Note: Replace with actual admin user ID
+POST {{baseUrl}}/api/users/admin_user_id_here/deactivate
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 34. DEACTIVATE Already Inactive User
+POST {{baseUrl}}/api/users/{{testUserId}}/deactivate
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 35. ASSIGN Role - Admin Access (Success)
+POST {{baseUrl}}/api/users/{{testUserId}}/assign-role
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": "{{testRoleName}}"
+}
+
+###
+### 36. ASSIGN Role - Unauthorized (Manager Role)
+POST {{baseUrl}}/api/users/{{testUserId}}/assign-role
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": "Admin"
+}
+
+###
+### 37. ASSIGN Role - Unauthorized (User Role)
+POST {{baseUrl}}/api/users/{{testUserId}}/assign-role
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": "Manager"
+}
+
+###
+### 38. ASSIGN Role - Non-existent User
+POST {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000/assign-role
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": "User"
+}
+
+###
+### 39. ASSIGN Role - Invalid Role Name
+POST {{baseUrl}}/api/users/{{testUserId}}/assign-role
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": "InvalidRole"
+}
+
+###
+### 40. ASSIGN Role - Missing Role Name
+POST {{baseUrl}}/api/users/{{testUserId}}/assign-role
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": ""
+}
+
+###
+### 41. REMOVE Role - Admin Access (Success)
+POST {{baseUrl}}/api/users/{{testUserId}}/remove-role
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": "{{testRoleName}}"
+}
+
+###
+### 42. REMOVE Role - Unauthorized (Manager Role)
+POST {{baseUrl}}/api/users/{{testUserId}}/remove-role
+Authorization: {{managerToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": "User"
+}
+
+###
+### 43. REMOVE Role - Non-existent User
+POST {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000/remove-role
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "roleName": "User"
+}
+
+###
+### 44. SETUP TOTP - Self (User Access)
+GET {{baseUrl}}/api/users/{{testUserId}}/totp/setup
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 45. SETUP TOTP - Admin for Other User
+GET {{baseUrl}}/api/users/{{testUserId}}/totp/setup
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 46. SETUP TOTP - Unauthorized (Different User)
+# Note: Use different user token trying to setup TOTP for testUserId
+GET {{baseUrl}}/api/users/{{testUserId}}/totp/setup
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 47. SETUP TOTP - Already Enabled
+GET {{baseUrl}}/api/users/{{testUserId}}/totp/setup
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 48. SETUP TOTP - Non-existent User
+GET {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000/totp/setup
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 49. ENABLE TOTP - Self (User Access)
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/enable
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "totpCode": "{{totpCode}}"
+}
+
+###
+### 50. ENABLE TOTP - Admin for Other User
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/enable
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+{
+  "totpCode": "{{totpCode}}"
+}
+
+###
+### 51. ENABLE TOTP - Unauthorized (Different User)
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/enable
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "totpCode": "{{totpCode}}"
+}
+
+###
+### 52. ENABLE TOTP - Invalid Code
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/enable
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "totpCode": "000000"
+}
+
+###
+### 53. ENABLE TOTP - Already Enabled
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/enable
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "totpCode": "{{totpCode}}"
+}
+
+###
+### 54. ENABLE TOTP - Missing Code
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/enable
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+{
+  "totpCode": ""
+}
+
+###
+### 55. DISABLE TOTP - Self (User Access)
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/disable
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 56. DISABLE TOTP - Admin for Other User
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/disable
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 57. DISABLE TOTP - Unauthorized (Different User)
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/disable
+Authorization: {{userToken}}
+Content-Type: {{contentType}}
+
+###
+### 58. DISABLE TOTP - Not Enabled
+POST {{baseUrl}}/api/users/{{testUserId}}/totp/disable
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+###
+### 59. DISABLE TOTP - Non-existent User
+POST {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000/totp/disable
+Authorization: {{adminToken}}
+Content-Type: {{contentType}}
+
+### End of Users API Tests
+### Expected Results Summary:
+### - Admin users should have full access to all endpoints
+### - Manager users should have access to most endpoints except delete and role management
+### - Regular users should only access their own TOTP settings
+### - All endpoints should return appropriate HTTP status codes
+### - Validation errors should be properly handled
+### - Audit logs should be created for all user management actions
