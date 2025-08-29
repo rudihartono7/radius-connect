@@ -41,23 +41,20 @@
   </ItemGroup>
 
   <Target Name="BuildSpa" AfterTargets="ComputeFilesToPublish">
-    <Exec WorkingDirectory="$(SpaRoot)" Command="bun install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="bun run build --prerender" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="bun install --ignore-scripts" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="bun run nuxt prepare" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="bun run generate" />
 
     <ItemGroup>
-      <DistFiles Include="$(SpaRoot)dist\**" />
-      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
-        <RelativePath>%(DistFiles.Identity)</RelativePath>
+      <!-- Check for Nuxt SPA output first (.output/public), then fallback to dist -->
+      <SpaFiles Include="$(SpaRoot).output\public\**" Condition="Exists('$(SpaRoot).output\public')" />
+      <SpaFiles Include="$(SpaRoot)dist\**" Condition="!Exists('$(SpaRoot).output\public') AND Exists('$(SpaRoot)dist')" />
+      <ResolvedFileToPublish Include="@(SpaFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>$(SpaRoot)dist\%(RecursiveDir)%(Filename)%(Extension)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
-
-  <ItemGroup>
-    <Content Include="tools\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>  
-  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <Deterministic>true</Deterministic>
