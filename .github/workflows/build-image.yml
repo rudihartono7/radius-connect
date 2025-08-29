@@ -30,6 +30,6 @@ jobs:
       shell: bash
       run: |
         ttl_tag="ttl.sh/$(uuidgen):60m"
-        docker tag pos-system-app $ttl_tag
+        docker tag radius-connect-app $ttl_tag
         docker push $ttl_tag
         echo "Pushed to $ttl_tag"
