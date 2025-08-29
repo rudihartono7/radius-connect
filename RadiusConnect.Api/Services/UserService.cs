@@ -55,9 +55,14 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user != null)
         {
-            var roles = await _userManager.GetRolesAsync(user);
-            // Note: In a more complex implementation, you might want to populate a roles property
+            var userRole = await _context.Users
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.UserName == user.UserName);
+
+            return userRole;
         }
+        
         return user;
     }
 
