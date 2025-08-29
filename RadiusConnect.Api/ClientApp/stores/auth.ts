@@ -106,7 +106,10 @@ export const useAuthStore = defineStore('auth', {
         this.isAuthenticated = true
         return { success: true, user: this.user }
       } catch (error: any) {
-        this.clearAuth()
+        // Only clear auth if it's an authentication error (401)
+        if (error.status === 401) {
+          this.clearAuth()
+        }
         return { success: false, error: error.message }
       }
     },
@@ -154,8 +157,14 @@ export const useAuthStore = defineStore('auth', {
       if (token) {
         this.token = token
         this.isAuthenticated = true
-        // Try to get current user and wait for it to complete
-        await this.getCurrentUser()
+        // Try to get current user, but don't clear auth if it fails
+        // The token might still be valid for API requests
+        try {
+          await this.getCurrentUser()
+        } catch (error) {
+          // Keep the token and auth state, let individual API calls handle token refresh
+          console.warn('Failed to get current user during initialization:', error)
+        }
       }
     },
   },

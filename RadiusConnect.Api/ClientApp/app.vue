@@ -9,8 +9,6 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
 
-// Initialize auth on app start
-onMounted(() => {
-  authStore.initializeAuth()
-})
+// Initialize auth immediately on app start (both client and server)
+authStore.initializeAuth()
 </script>
