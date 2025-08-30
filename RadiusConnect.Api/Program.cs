@@ -162,39 +162,42 @@ builder.Services.AddStructuredLogging();
 // CORS Configuration
 builder.Services.AddCors(options =>
 {
-        options.AddPolicy("DefaultPolicy", policy =>
-        {
-                policy.WithOrigins(
-                                builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? 
-                                new[] { "http://localhost:3000", "https://localhost:3000" })
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
-        });
+    options.AddPolicy("DefaultPolicy", policy =>
+    {
+            policy.WithOrigins(
+                            builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? 
+                            new[] { "http://localhost:3000", "https://localhost:3000" })
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+    });
 
+    if (builder.Environment.IsDevelopment())
+    { 
         // Permissive policy used during Nuxt/SPA development. Keeps calls from local dev servers working.
         options.AddPolicy("AllowNuxtDev", policy =>
-        {
-                if (builder.Environment.IsDevelopment())
-                {
-                        // Allow any local origin in development (useful for Nuxt dev server on different port)
-                        policy.SetIsOriginAllowed(origin =>
-                                        origin.StartsWith("http://localhost:", StringComparison.OrdinalIgnoreCase) ||
-                                        origin.StartsWith("https://localhost:", StringComparison.OrdinalIgnoreCase))
-                                    .AllowAnyMethod()
-                                    .AllowAnyHeader()
-                                    .AllowCredentials();
-                }
-                else
-                {
-                        policy.WithOrigins(
-                                        builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ??
-                                        new[] { "http://localhost:3000", "https://localhost:3000" })
-                                    .AllowAnyMethod()
-                                    .AllowAnyHeader()
-                                    .AllowCredentials();
-                }
-        });
+            {
+                    if (builder.Environment.IsDevelopment())
+                    {
+                            // Allow any local origin in development (useful for Nuxt dev server on different port)
+                            policy.SetIsOriginAllowed(origin =>
+                                            origin.StartsWith("http://localhost:", StringComparison.OrdinalIgnoreCase) ||
+                                            origin.StartsWith("https://localhost:", StringComparison.OrdinalIgnoreCase))
+                                        .AllowAnyMethod()
+                                        .AllowAnyHeader()
+                                        .AllowCredentials();
+                    }
+                    else
+                    {
+                            policy.WithOrigins(
+                                            builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ??
+                                            new[] { "http://localhost:3000", "https://localhost:3000" })
+                                        .AllowAnyMethod()
+                                        .AllowAnyHeader()
+                                        .AllowCredentials();
+                    }
+            });
+    }
 });
 
 // Swagger/OpenAPI Configuration
@@ -275,6 +278,7 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "RadiusConnect API v1");
         options.RoutePrefix = string.Empty; // Serve Swagger UI at root
     });
+    
     app.UseCors("AllowNuxtDev");
 }
 
