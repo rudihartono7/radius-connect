@@ -1,15 +1,28 @@
 export const useAuthCookies = () => {
-  const getTokenCookie = () => useCookie('auth-token', {
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-    secure: true,
-    sameSite: 'strict'
-  })
+  // Determine if we're in a secure context (HTTPS or localhost)
+  const isSecureContext = () => {
+    if (process.client) {
+      return window.location.protocol === 'https:' || 
+             window.location.hostname === 'localhost' ||
+             window.location.hostname === '127.0.0.1'
+    }
+    return false
+  }
 
-  const getRefreshTokenCookie = () => useCookie('refresh-token', {
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-    secure: true,
-    sameSite: 'strict'
-  })
+  // Get cookie options based on environment
+  const getCookieOptions = (maxAge: number) => {
+    const secure = isSecureContext()
+    return {
+      maxAge,
+      secure,
+      sameSite: secure ? 'strict' as const : 'lax' as const,
+      httpOnly: false // Must be false for client-side access
+    }
+  }
+
+  const getTokenCookie = () => useCookie('auth-token', getCookieOptions(60 * 60 * 24 * 7)) // 7 days
+
+  const getRefreshTokenCookie = () => useCookie('refresh-token', getCookieOptions(60 * 60 * 24 * 30)) // 30 days
 
   const setToken = (token: string) => {
     const cookie = getTokenCookie()

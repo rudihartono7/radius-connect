@@ -164,16 +164,26 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("DefaultPolicy", policy =>
     {
-        // policy.WithOrigins(
-        //                 builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? 
-        //                 new[] { "http://localhost:3000", "https://localhost:3000" })
-        //             .AllowAnyMethod()
-        //             .AllowAnyHeader()
-        //             .AllowCredentials();
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? 
+                           new[] { "http://localhost:3000", "https://localhost:3000" };
+        
+        policy.SetIsOriginAllowed(origin =>
+        {
+            // Allow localhost origins
+            if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
+                return true;
+            
+            // Allow any origin on ports 3000 and 5173 (common dev ports)
+            var uri = new Uri(origin);
+            if (uri.Port == 3000 || uri.Port == 5173)
+                return true;
+            
+            // Check against configured allowed origins
+            return allowedOrigins.Contains(origin);
+        })
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 
     if (builder.Environment.IsDevelopment())

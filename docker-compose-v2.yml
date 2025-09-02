@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  api:
+    image: "ttl.sh/6a7c3393-b648-4362-a726-fda1131a2ee6:60m"
+    container_name: radius-connect-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=154.19.37.95;Port=3309;Database=RadiusConnect_Dev;User=root;Password=root_password;SslMode=None;
+      - ConnectionStrings__RadiusConnection=Server=154.19.37.95;Port=3309;Database=radius;User=root;Password=root_password;SslMode=None;
+    ports:
+      - "5069:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+#    networks:
+#      - appnet
+    volumes:
+      - ./logs:/app/logs:rw
+
+#networks:
+#  appnet:
+#    driver:

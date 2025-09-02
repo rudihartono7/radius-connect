@@ -19,13 +19,13 @@ RUN dotnet restore
 COPY . ./
 
 # Build the Nuxt SPA first
-WORKDIR /app/ClientApp
-RUN bun install --ignore-scripts
-RUN bun run nuxt prepare
-RUN bun run generate
+# WORKDIR /app/ClientApp
+# RUN bun install --ignore-scripts
+# RUN bun run nuxt prepare
+# RUN bun run generate
 
 # Create dist symlink if it doesn't exist (Nuxt generate creates .output/public)
-RUN if [ ! -d "dist" ] && [ -d ".output/public" ]; then ln -sf .output/public dist; fi
+# RUN if [ ! -d "dist" ] && [ -d ".output/public" ]; then ln -sf .output/public dist; fi
 
 # Go back to app root and publish .NET application
 WORKDIR /app

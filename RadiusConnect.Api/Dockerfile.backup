@@ -1,0 +1,35 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /app
+
+# Install required packages and Bun (for building the Nuxt client)
+RUN apt update && apt install -y unzip curl
+RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr bash -s "bun-v1.2.7"
+
+COPY *.csproj ./
+RUN dotnet restore
+
+COPY . ./
+
+# Build the Nuxt client so its static output is available to the published app
+WORKDIR /app/ClientApp
+RUN bun install
+# Try the normal build, fall back to generate if project is configured as a static generate
+RUN bun run build || bun run generate
+# Ensure the app expects a consistent `dist` directory (Program.cs references ClientApp/dist)
+RUN mkdir -p /app/ClientApp/dist
+RUN if [ -d ".output/public" ]; then cp -r .output/public/* /app/ClientApp/dist/; elif [ -d "dist" ]; then cp -r dist/* /app/ClientApp/dist/; fi
+
+WORKDIR /app
+RUN dotnet publish -c Release -o /publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y libgdiplus
+
+COPY --from=build /publish .
+
+EXPOSE 80
+EXPOSE 443
+
+ENTRYPOINT ["dotnet", "RadiusConnect.Api.dll"]

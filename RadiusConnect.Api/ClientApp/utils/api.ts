@@ -1,4 +1,5 @@
 import type { ApiResponse, PagedApiResponse } from '~/types'
+import { useAuthCookies } from '~/composables/useAuthCookies'
 
 class ApiError extends Error {
   constructor(
@@ -36,7 +37,8 @@ export const api = {
     }
 
     // Add auth token if available
-    const token = useCookie('auth-token').value
+    const { getToken } = useAuthCookies()
+    const token = getToken()
     if (token) {
       defaultHeaders.Authorization = `Bearer ${token}`
     }
