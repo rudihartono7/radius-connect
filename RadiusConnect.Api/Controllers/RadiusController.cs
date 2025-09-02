@@ -123,7 +123,7 @@ public class RadiusController : BaseController
             }
             
             // Update attributes if provided
-            var user = await _radiusService.UpdateRadiusUserAsync(username, request.Attributes, null);
+            var user = await _radiusService.UpdateRadiusUserAsync(username, request.CheckAttributes?.ToArray(), request.ReplyAttributes?.ToArray());
             
             // Log RADIUS user update
             var currentUserId = GetCurrentUserId();
@@ -299,7 +299,7 @@ public class RadiusController : BaseController
                 return Conflict("RADIUS group already exists");
             }
 
-            var group = await _radiusService.CreateRadiusGroupAsync(request.GroupName, request.CheckAttributes, request.ReplyAttributes);
+            var group = await _radiusService.CreateRadiusGroupAsync(request.GroupName, request.CheckAttributes?.ToDictionary(a => a.Attribute, a => a.Value), request.ReplyAttributes?.ToDictionary(a => a.Attribute, a => a.Value));
             
             // Log RADIUS group creation
             var currentUserId = GetCurrentUserId();
@@ -587,22 +587,6 @@ public class RadiusController : BaseController
     #endregion
 }
 
-// DTOs
-
-public class UpdateRadiusUserRequest
-{
-    public string? Password { get; set; }
-    public Dictionary<string, string>? Attributes { get; set; }
-}
-
-public class CreateRadiusGroupRequest
-{
-    [Required]
-    public string GroupName { get; set; } = string.Empty;
-
-    public Dictionary<string, string>? CheckAttributes { get; set; }
-    public Dictionary<string, string>? ReplyAttributes { get; set; }
-}
 
 public class AddAttributeRequest
 {

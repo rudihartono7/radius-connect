@@ -1,21 +1,11 @@
 export const useAuthCookies = () => {
-  // Determine if we're in a secure context (HTTPS or localhost)
-  const isSecureContext = () => {
-    if (process.client) {
-      return window.location.protocol === 'https:' || 
-             window.location.hostname === 'localhost' ||
-             window.location.hostname === '127.0.0.1'
-    }
-    return false
-  }
-
-  // Get cookie options based on environment
+  // Use relaxed cookie settings for better compatibility
+  // This allows tokens to work across different access methods (localhost, IP, domain)
   const getCookieOptions = (maxAge: number) => {
-    const secure = isSecureContext()
     return {
       maxAge,
-      secure,
-      sameSite: secure ? 'strict' as const : 'lax' as const,
+      secure: false, // Allow HTTP access
+      sameSite: 'lax' as const, // Allow cross-site requests
       httpOnly: false // Must be false for client-side access
     }
   }

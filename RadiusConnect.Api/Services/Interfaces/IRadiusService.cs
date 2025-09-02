@@ -7,7 +7,7 @@ public interface IRadiusService
 {
     // User management
     Task<bool> CreateRadiusUserAsync(CreateRadiusUserRequest request);
-    Task<bool> UpdateRadiusUserAsync(string username, Dictionary<string, string>? checkAttributes = null, Dictionary<string, string>? replyAttributes = null);
+    Task<bool> UpdateRadiusUserAsync(string username, RadiusAttributeDto[]? checkAttributes = null, RadiusAttributeDto[]? replyAttributes = null);
     Task<bool> UpdateRadiusUserPasswordAsync(string username, string newPassword);
     Task<bool> DeleteRadiusUserAsync(string username);
     Task<bool> RadiusUserExistsAsync(string username);

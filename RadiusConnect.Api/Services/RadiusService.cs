@@ -83,10 +83,60 @@ public class RadiusService : IRadiusService
         return result.Any();
     }
     
-    public async Task<bool> UpdateRadiusUserAsync(string username, Dictionary<string, string>? checkAttributes = null, Dictionary<string, string>? replyAttributes = null)
+    public async Task<bool> UpdateRadiusUserAsync(string username, RadiusAttributeDto[]? checkAttributes = null, RadiusAttributeDto[]? replyAttributes = null)
     {
         _logger.LogInformation("Updating RADIUS user: {Username}", username);
-        // Basic implementation - would need actual RADIUS database operations
+
+        //Delete existing attributes from radcheck and radreply when user exists
+        var userExists = await RadiusUserExistsAsync(username);
+        if (userExists)
+        {
+            if (checkAttributes != null)
+            {
+                foreach (var attr in checkAttributes)
+                {
+                    await RemoveUserCheckAttributeAsync(username, attr.Attribute);
+                }
+            }
+
+            if (replyAttributes != null)
+            {
+                foreach (var attr in replyAttributes)
+                {
+                    await RemoveUserReplyAttributeAsync(username, attr.Attribute);
+                }
+            }
+        }
+
+        if (checkAttributes != null)
+        {
+            foreach (var attr in checkAttributes)
+            {
+                await _radiusRepository.AddUserCheckAttributeAsync(new RadCheck
+                {
+                    Username = username,
+                    Attribute = attr.Attribute,
+                    Op = attr.Op,
+                    Value = attr.Value
+                });
+            }
+        }
+
+        if (replyAttributes != null)
+        {
+            foreach (var attr in replyAttributes)
+            {
+                await _radiusRepository.AddUserReplyAttributeAsync(new RadReply
+                {
+                    Username = username,
+                    Attribute = attr.Attribute,
+                    Op = attr.Op,
+                    Value = attr.Value
+                });
+            }
+        }
+
+        
         return await Task.FromResult(true);
     }
 
@@ -124,6 +174,19 @@ public class RadiusService : IRadiusService
         var users = new List<object>();
         foreach (var username in distinctUsernames)
         {
+            var radiusUser = await _radiusRepository.GetUserCheckAttributesAsync(username);
+            if (!radiusUser.Any())
+            {
+                continue; // Skip users without check attributes
+            }
+
+            var radiusUserReply = await _radiusRepository.GetUserReplyAttributesAsync(username);
+
+            if( radiusUserReply == null )
+            {
+                radiusUserReply = new List<RadReply>();
+            }
+
             var groups = await _radiusContext.RadUserGroup
                 .Where(rug => rug.Username == username)
                 .Select(rug => rug.GroupName)
@@ -137,13 +200,25 @@ public class RadiusService : IRadiusService
             var isActive = await _radiusContext.RadCheck
                 .AnyAsync(rc => rc.Username == username && rc.Attribute == "Auth-Type" && rc.Value != "Reject");
 
-            users.Add(new
+            users.Add(new RadiusUserDto
             {
                 Username = username,
                 Groups = groups,
                 IsActive = isActive,
-                LastLogin = lastAuth?.AuthDate,
-                LastAuthResult = lastAuth?.Reply
+                LastAuth = lastAuth?.AuthDate,
+                CheckAttributes = radiusUser.Select(rc => new RadiusAttributeDto
+                {
+                    Attribute = rc.Attribute,
+                    Op = rc.Op,
+                    Value = rc.Value
+                }).ToList(),
+
+                ReplyAttributes = radiusUserReply.Select(rc => new RadiusAttributeDto
+                {
+                    Attribute = rc.Attribute,
+                    Op = rc.Op,
+                    Value = rc.Value
+                }).ToList()
             });
         }
         
