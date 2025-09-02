@@ -164,12 +164,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("DefaultPolicy", policy =>
     {
-            policy.WithOrigins(
-                            builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? 
-                            new[] { "http://localhost:3000", "https://localhost:3000" })
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials();
+        // policy.WithOrigins(
+        //                 builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? 
+        //                 new[] { "http://localhost:3000", "https://localhost:3000" })
+        //             .AllowAnyMethod()
+        //             .AllowAnyHeader()
+        //             .AllowCredentials();
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 
     if (builder.Environment.IsDevelopment())
